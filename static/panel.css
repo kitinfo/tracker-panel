@@ -3,7 +3,7 @@ body {
 	height:100%;
 }
 
-h2{
+h2,h3{
 	padding:0;
 	display:inline-block;
 	margin:0;
@@ -52,6 +52,10 @@ h2{
 	background-color:#ddd;
 }
 
+#details-main{
+	margin-top:2em;
+}
+
 #torrent-table-wrap{
 	width:100%;
 	margin-top:2em;
@@ -73,4 +77,16 @@ td {
 
 .name-column{
 	width:80%;
+}
+
+#category-list{
+	padding:0.4em;
+}
+
+.subitem{
+	padding-left:0.4em;
+}
+
+.item{
+	padding:0.5em;
 }
