@@ -75,7 +75,8 @@ function request($db, $tag, $retVal) {
 	// options
 	if (!empty($tagObject)) {
 	    //query('settings', $retVal);
-	    $STMT = $db->query("SELECT * FROM " . $tag . " WHERE id = " . $tagObject);
+	    $STMT = $db->prepare("SELECT * FROM " . $tag . " WHERE id = ?");
+	    $STMT->execute(array($tagObject));
 	} else {
 	    //query('settings', $retVal);
 	    $STMT = $db->query("SELECT * FROM " . $tag);
