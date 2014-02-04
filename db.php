@@ -10,6 +10,14 @@ foreach ($tables as $table) {
     $retVal = request($db, $table, $retVal);
 }
 
+$tag = 'torrentcategories';
+$view = $_GET[$tag];
+
+if (isset($view)) {
+
+	$retVal[$tag] = getView($db, $view, $tag);
+}
+
 header("Content-Type: application/javascript");
 header("Access-Control-Allow-Origin: *");
 # Rückmeldung senden
@@ -19,6 +27,27 @@ if (isset($_GET["callback"]) && !empty($_GET["callback"])) {
     echo $callback . "('" . json_encode($retVal, JSON_NUMERIC_CHECK) . "')";
 } else {
     echo json_encode($retVal, JSON_NUMERIC_CHECK);
+}
+
+function getView($db, $view, $tag) {
+
+    if (empty($view)) {
+	$stm = $db->prepare("SELECT * FROM [". $tag ."]");
+	$stm->execute();
+    } else {
+	$stm = $db->prepare("SELECT * FROM [" . $tag . "] WHERE id = :view");
+	$stm->execute(array(
+	    ':view' => $view
+	));
+    }
+
+    
+
+
+    $retVal = $stm->fetchAll(PDO::FETCH_ASSOC);
+    $stm->closeCursor();
+
+    return $retVal;
 }
 
 function getTables($db) {
