@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Tracker Panel</title>
+		<link rel="icon" href="static/favicon.ico" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="static/panel.css" />
+		<meta name="robots" content="noindex,nofollow" />
+	</head>
+	<body>
+		<div id="center-wrap">
+			<div id="head-info">
+				<img src="static/header.svg" alt="Tracker Panel Head Image" />
+				<div>Currently tracking 5 torrents</div>
+			</div>
+			
+			<div id="view-torrents">
+				<div>
+					<span class="fancybutton">Add</span>
+					<select id="cat-selector">
+						<option value="New">New</option>
+						<option value="New">Mov</option>
+						<option value="New">Games</option>
+					</select>
+				</div>
+				<div id="torrent-table-wrap">
+					<table id="torrent-table">
+						<tr>
+							<th class="name-column">Name</th>
+							<th class="dlcount-column">Downloads</th>
+							<th class="options-column">Options</th>
+						</tr>
+						<tr>
+							<td class="name-column">Test</td>
+							<td class="dlcount-column">Test</td>
+							<td class="options-column">[Download] [Details]</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			
+			<div id="view-details">
+				<div>
+					<span class="fancybutton">Back</span>
+					<h2>Torrent Title</h2>
+				</div>
+				
+				<div>
+					<div>
+						Categories: <span class="cat-button">Porn</span>
+					</div>
+					<div>
+						Meta-Info:<br/>
+						Info-Hash: asdasd<br/>
+						Completion Count: n<br/>
+						Peers/Seeds: x/y<br/>
+					</div>
+					<div>
+						Description [Edit]:<br/>
+						asdasdasd
+					</div>
+					<div>
+						Options: [Delete] [Download]
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
