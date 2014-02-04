@@ -1,13 +1,21 @@
 <?php
-    # open db
+
+$TABLES = array(
+    "peers" => "id",
+    "categories" => "id",
+    "torrents" => "id"
+);
+
+
+# open db
 $db = new PDO("sqlite:backing.db3");
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
         
 $retVal["status"]="ok";
 
-$tables = getTables($db);
+$tables = array_keys($TABLES);
 foreach ($tables as $table) {
-    $retVal = request($db, $table, $retVal);
+    $retVal = request($db, $table, $TABLES[$table], $retVal);
 }
 
 $tag = 'torrentcategories';
@@ -66,7 +74,7 @@ function getTables($db) {
     return $tables;
 }
 
-function request($db, $tag, $retVal) {
+function request($db, $tag, $searchTag, $retVal) {
 
     $tagObject = $_GET[$tag];
 
@@ -74,11 +82,9 @@ function request($db, $tag, $retVal) {
 
 	// options
 	if (!empty($tagObject)) {
-	    //query('settings', $retVal);
-	    $STMT = $db->prepare("SELECT * FROM " . $tag . " WHERE id = ?");
+	    $STMT = $db->prepare("SELECT * FROM " . $tag . " WHERE " . $searchTag . " = ?");
 	    $STMT->execute(array($tagObject));
 	} else {
-	    //query('settings', $retVal);
 	    $STMT = $db->query("SELECT * FROM " . $tag);
 	}
 
