@@ -98,6 +98,10 @@ var gui={
 		var drop=gui.elem("cat-selector");
 		drop.innerHTML="";
 		
+		var option=gui.build("option","All");
+		option.value=-2;
+		drop.appendChild(option);
+		
 		var option=gui.build("option","New");
 		option.value=-1;
 		drop.appendChild(option);
@@ -151,8 +155,8 @@ var tracker={
 		tracker.views["details"]=document.getElementById("view-details");
 		
 		tracker.showView("list");
-		tracker.loadTorrents();
 		tracker.loadCategories();
+		tracker.loadTorrents();
 	},
 	
 	showView:function(tag){
@@ -163,7 +167,7 @@ var tracker={
 	},
 	
 	loadTorrents:function(){
-		//TODO respect filters
+		//TODO respect filters (default: all)
 		//TODO force single instance
 		api.request("torrents",function(data){
 			tracker.torrents=[];
