@@ -1,7 +1,7 @@
 var api={
 	url:"db.php?",
 	
-	request:function(argument,completionfunc){
+	request:function(argument, completionfunc){
 		ajax.asyncGet(api.url+argument,function(request){
 			if(request.status==200){
 				try{
@@ -19,6 +19,10 @@ var api={
 		function(exc){
 			tracker.pushStatus("Failed to connect API ("+exc+")");
 		});
+	},
+	
+	syncpost:function(argument, payload){
+		return ajax.syncPost(api.url+argument,payload,"application/json");
 	}
 }
 
@@ -157,10 +161,12 @@ var gui={
 			//find torrent & category
 			torrent=gui.elem("torrent-name-input").getAttribute("data-dbid");
 			category=event.target.parentNode.getAttribute("data-dbid");
-			//TODO issue remove request
-			window.alert("Removing mapping ("+torrent+","+category+")");
-			//upon success, kill button
-			event.target.parentNode.parentNode.removeChild(event.target.parentNode);
+			if(tracker.modifyTorrentCategory("del", torrent, category)){
+				event.target.parentNode.parentNode.removeChild(event.target.parentNode);
+			}
+			else{
+				tracker.pushStatus("Failed to delete category mapping!");
+			}
 		},
 		
 		handleCategoryAdd:function(event){
@@ -172,10 +178,13 @@ var gui={
 					return;
 				}
 				
-				//TODO push to db
-				
-				var button=gui.details.createCategoryButton(tracker.categories[cat]);
-				event.target.parentNode.insertBefore(button,event.target);
+				if(tracker.modifyTorrentCategory("add", gui.elem("torrent-name-input").getAttribute("data-dbid"), cat)){
+					var button=gui.details.createCategoryButton(tracker.categories[cat]);
+					event.target.parentNode.insertBefore(button,event.target);
+				}
+				else{
+					tracker.pushStatus("Failed to delete category mapping!");
+				}
 			}
 			else{
 				tracker.pushStatus("Invalid category selection.");
@@ -192,7 +201,6 @@ var tracker={
 	
 	torrentDBIDtoIndex:function(dbid){
 		for(var i=0;i<tracker.torrents.length;i++){
-			//window.alert(" vs ");
 			if(tracker.torrents[i].dbid==dbid){
 				return i;
 			}
@@ -202,7 +210,6 @@ var tracker={
 	
 	categoryDBIDtoIndex:function(dbid){
 		for(var i=0;i<tracker.categories.length;i++){
-			//window.alert(" vs ");
 			if(tracker.categories[i].dbid==dbid){
 				return i;
 			}
@@ -227,7 +234,6 @@ var tracker={
 	},
 	
 	loadTorrents:function(){
-		//TODO respect filters (default: all)
 		//TODO force single instance
 		var drop=gui.elem("cat-selector");
 		var api_arg=(drop.value=="all"||!drop.value)?"":"&cat="+drop.value;
@@ -265,7 +271,8 @@ var tracker={
 	},
 	
 	modifyTorrentCategory:function(action, torrent, category){
-		//TODO
+		var req=api.syncpost("category-"+action,JSON.stringify({"torrent":torrent,"category":category}));
+		return req.status==200;
 	},
 	
 	deleteDisplayedTorrent:function(){
