@@ -5,8 +5,15 @@ $TABLES = array(
     "categories" => "id",
     "torrents" => "id"
 );
+$VIEWS = array(
+    "torrentcategories" => "torrent",
+    "newtorrents" => "id"
+);
 
 
+//TODO: POST delete torrent
+//TODO: POST delete catmapping
+//TODO: POST add catmapping
 # open db
 $db = new PDO("sqlite:backing.db3");
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
@@ -18,12 +25,24 @@ foreach ($tables as $table) {
     $retVal = request($db, $table, $TABLES[$table], $retVal);
 }
 
-$tag = 'torrentcategories';
-$view = $_GET[$tag];
+$viewKeys = array_keys($VIEWS);
+foreach ($viewKeys as $view) {
+    $viewData = $_GET[$view];
 
-if (isset($view)) {
+    if (isset($viewData)) {
+	$retVal[$view] = getView($db, $viewData, $view, $TABLES[$view]);
+    }
+}
 
-	$retVal[$tag] = getView($db, $view, $tag);
+$cat = $_GET["cat"];
+$torrents = $_GET["torrents"];
+
+if (isset($torrents) && isset($cat) && !empty($cat)) {
+    if ($cat == "new") {
+	$retVal["torrents"] = getView($db, "*", "newtorrents", "category");
+    } else {
+	$retVal["torrents"] = getView($db, $cat, "torrentcategories", "category");
+    }
 }
 
 header("Content-Type: application/json");
@@ -37,21 +56,17 @@ if (isset($_GET["callback"]) && !empty($_GET["callback"])) {
     echo json_encode($retVal, JSON_NUMERIC_CHECK);
 }
 
-function getView($db, $view, $tag) {
+function getView($db, $data, $tag, $search) {
 
-    if (empty($view)) {
-	$stm = $db->prepare("SELECT * FROM [". $tag ."]");
+    if (empty($data) || $data == "*") {
+	$stm = $db->prepare("SELECT * FROM [" . $tag . "]");
 	$stm->execute();
     } else {
-	$stm = $db->prepare("SELECT * FROM [" . $tag . "] WHERE id = :view");
+	$stm = $db->prepare("SELECT * FROM [" . $tag . "] WHERE " . $search . " = :data");
 	$stm->execute(array(
-	    ':view' => $view
+	    ':data' => $data
 	));
     }
-
-    
-
-
     $retVal = $stm->fetchAll(PDO::FETCH_ASSOC);
     $stm->closeCursor();
 
