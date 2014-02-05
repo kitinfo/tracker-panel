@@ -138,6 +138,8 @@ var gui={
 		gui.elem("torrent-name").style.display="inline-block";
 		gui.elem("torrent-title-edit-link").style.display="inline-block";
 		gui.elem("torrent-name-input").style.display="none";
+		
+		
 	},
 	
 	details:{
@@ -169,7 +171,7 @@ var gui={
 			}
 		},
 		
-		handleCategoryAdd:function(event){
+		categoryAddHandler:function(event){
 			var drop=gui.elem("add-cat-selector");
 			if(drop.selectedIndex!=0){
 				var cat=tracker.categoryDBIDtoIndex(drop.selectedIndex);
@@ -272,7 +274,16 @@ var tracker={
 	
 	modifyTorrentCategory:function(action, torrent, category){
 		var req=api.syncpost("category-"+action,JSON.stringify({"torrent":torrent,"category":category}));
-		return req.status==200;
+		try{
+			var reply=JSON.parse(req.responseText);
+			if(reply.status==0){
+				return true;
+			}
+			return false;
+		}
+		catch(e){
+			return false;
+		}
 	},
 	
 	deleteDisplayedTorrent:function(){
