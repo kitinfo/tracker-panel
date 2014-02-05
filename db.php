@@ -91,7 +91,7 @@ function addCatMapping($db, $torrent, $cat) {
 	":cat" => $cat
     ));
 
-    $retVal = $stm->errorCode();
+    $retVal = $stm->errorInfo();
 
     $stm->closeCursor();
     return $retVal;
@@ -107,7 +107,7 @@ function delCatMapping($db, $torrent, $cat) {
 	":cat" => $cat
     ));
 
-    $retVal = $stm->errorCode();
+    $retVal = $stm->errorInfo();
 
     $stm->closeCursor();
     return $retVal;
