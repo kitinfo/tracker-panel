@@ -291,7 +291,22 @@ var tracker={
 		var input=gui.elem("torrent-name-input");
 		var torrent=input.getAttribute("data-dbid");
 		var index=tracker.torrentDBIDtoIndex(torrent);
-		window.alert("TODO: Change torrent "+torrent+" (index "+index+") name to "+input.value);
+		
+		var req=api.syncpost("torrent-rename",JSON.stringify({"id":torrent,"name":input.value}));
+		try{
+			var reply=JSON.parse(req.responseText);
+			if(reply.status[0]!=0){
+				tracker.pushStatus("Failed to rename: "+reply.status[2]);
+			}
+			else{
+				tracker.torrents[index].name=input.value;
+			}
+		}
+		catch(e){
+			tracker.pushStatus("Failed to rename: "+e);
+		}
+		
+		gui.table.init();
 		gui.updateDetailScreen(tracker.torrents[index]);
 	},
 	
