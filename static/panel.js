@@ -173,7 +173,7 @@ var gui={
 			var drop=gui.elem("add-cat-selector");
 			if(drop.selectedIndex!=0){
 				var cat=tracker.categoryDBIDtoIndex(drop.selectedIndex);
-				if(cat<0){
+				if(cat<=0){
 					tracker.pushStatus("Invalid category selection.");
 					return;
 				}
@@ -183,7 +183,7 @@ var gui={
 					event.target.parentNode.insertBefore(button,event.target);
 				}
 				else{
-					tracker.pushStatus("Failed to delete category mapping!");
+					tracker.pushStatus("Failed to add category mapping!");
 				}
 			}
 			else{
