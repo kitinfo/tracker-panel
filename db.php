@@ -57,15 +57,7 @@ if (isset($torrents) && isset($cat) && !empty($cat)) {
 }
 
 
-if ($_GET["torrent-del"]) {
 
-    $id = $_POST["id"];
-
-    if (isset($id) && !empty($id)) {
-
-	$retVal["status"] = delTorrent($db, $torrent);
-    }
-}
 
 if (isset($http_raw) && !empty($http_raw)) {
 
@@ -77,6 +69,9 @@ if (isset($http_raw) && !empty($http_raw)) {
     }
     if (isset($_GET["category-del"])) {
 	$retVal["status"] = delCatMapping($db, $obj["torrent"], $obj["category"]);
+    }
+    if (isset($_GET["torrent-del"])) {
+	$retVal["status"] = delTorrent($db, $obj["id"]);
     }
 }
 
