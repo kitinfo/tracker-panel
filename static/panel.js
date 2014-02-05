@@ -143,8 +143,8 @@ var gui={
 		var listnode=gui.elem("category-list");
 		var buttons=listnode.getElementsByClassName("cat-button");
 		
-		for(var i=0;i<buttons.length;i++){
-			listnode.removeChild(buttons[i]);
+		while(buttons.length>0){
+			listnode.removeChild(buttons[0]);
 		}
 		
 		//fetch active categories
@@ -152,13 +152,13 @@ var gui={
 			if(data.categories){
 				data.categories.forEach(function(entry){
 					var catid=tracker.categoryDBIDtoIndex(entry.category);
-					if(catid>0){
+					if(catid>=0){
 						var button=gui.details.createCategoryButton(tracker.categories[catid]);
 						var adder=gui.elem("add-cat-selector");
 						adder.parentNode.insertBefore(button,adder);
 					}
 					else{
-						tracker.pushState("Invalid category "+entry.category);
+						tracker.pushStatus("Invalid category "+entry.category+" in setup ");
 					}
 				});
 			}
@@ -197,13 +197,13 @@ var gui={
 		categoryAddHandler:function(event){
 			var drop=gui.elem("add-cat-selector");
 			if(drop.selectedIndex!=0){
-				var cat=tracker.categoryDBIDtoIndex(drop.selectedIndex);
-				if(cat<=0){
-					tracker.pushStatus("Invalid category selection.");
+				var cat=tracker.categoryDBIDtoIndex(drop.options[drop.selectedIndex].value);
+				if(cat<0){
+					tracker.pushStatus("Category not in local dataset, this should not happen");
 					return;
 				}
 				
-				if(tracker.modifyTorrentCategory("add", gui.elem("torrent-name-input").getAttribute("data-dbid"), cat)){
+				if(tracker.modifyTorrentCategory("add", gui.elem("torrent-name-input").getAttribute("data-dbid"), tracker.categories[cat].dbid)){
 					var button=gui.details.createCategoryButton(tracker.categories[cat]);
 					event.target.parentNode.insertBefore(button,event.target);
 				}
@@ -212,7 +212,7 @@ var gui={
 				}
 			}
 			else{
-				tracker.pushStatus("Invalid category selection.");
+				tracker.pushStatus("Invalid category selection ("+drop.selectedIndex+").");
 			}
 			drop.selectedIndex=0;
 		}
