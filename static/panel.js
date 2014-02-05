@@ -13,7 +13,7 @@ var api={
 				}
 			}
 			else{
-				tracker.pushStatus("Server replied with error code");
+				tracker.pushStatus("Server replied with failure code ("+request.status+")");
 			}
 		},
 		function(exc){
