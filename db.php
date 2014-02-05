@@ -55,6 +55,11 @@ if (isset($torrents) && isset($cat) && !empty($cat)) {
     }
 }
 
+$delTorrent = $_POST["torrent-del"];
+
+if (issst($delTorrent) && !empty($delTorrent)) {
+    $retVal["status"] = delTorrent($db, $torrent);
+}
 
 if (isset($http_raw) && !empty($http_raw)) {
 
@@ -79,6 +84,20 @@ if (isset($_GET["callback"]) && !empty($_GET["callback"])) {
     echo $callback . "('" . json_encode($retVal, JSON_NUMERIC_CHECK) . "')";
 } else {
     echo json_encode($retVal, JSON_NUMERIC_CHECK);
+}
+
+function delTorrent($db, $torrent) {
+    $query = "DELETE FROM torrents WHERE id = :torrent";
+
+    $stm = $db->prepare($query);
+    $stm->execute(array(
+	":torrent" => $torrent
+    ));
+
+    $retVal = $stm->errorInfo();
+
+    $stm->closeCursor();
+    return $retVal;
 }
 
 function addCatMapping($db, $torrent, $cat) {
