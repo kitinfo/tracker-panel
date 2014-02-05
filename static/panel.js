@@ -313,7 +313,16 @@ var tracker={
 	},
 	
 	deleteDisplayedTorrent:function(){
-		api.syncpost("torrent-del",JSON.stringify({"id":gui.elem("torrent-name-input").getAttribute("data-dbid")}),"x-www-formencoded");
+		var req=api.syncpost("torrent-del",JSON.stringify({"id":gui.elem("torrent-name-input").getAttribute("data-dbid")}),"x-www-formencoded");
+		try{
+			var data=JSON.parse(req.responseText);
+			if(data.status[0]!=0){
+				tracker.pushStatus("Failed to delete: "+data.status[2]);
+			}
+		}
+		catch(e){
+			tracker.pushStatus("Failed to delete: "+e);
+		}
 		tracker.loadTorrents();
 		tracker.showView("list");
 	}
