@@ -56,10 +56,15 @@ if (isset($torrents) && isset($cat) && !empty($cat)) {
     }
 }
 
-$delTorrent = $_POST["torrent-del"];
 
-if (isset($delTorrent) && !empty($delTorrent)) {
-    $retVal["status"] = delTorrent($db, $torrent);
+if ($_GET["torrent-del"]) {
+
+    $id = $_POST["id"];
+
+    if (isset($id) && !empty($id)) {
+
+	$retVal["status"] = delTorrent($db, $torrent);
+    }
 }
 
 if (isset($http_raw) && !empty($http_raw)) {
