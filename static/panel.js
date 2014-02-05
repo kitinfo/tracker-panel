@@ -116,6 +116,8 @@ var gui={
 			option=gui.build("option",cat.name);
 			option.value=cat.dbid;
 			drop.appendChild(option);
+			option=gui.build("option",cat.name);
+			option.value=cat.dbid;
 			adder.appendChild(option);
 		});
 	},
@@ -142,14 +144,43 @@ var gui={
 		},
 		
 		createCategoryButton:function(cat){
-			//TODO
+			var elem=gui.build("span",cat.name+" ","cat-button");
+			var link=gui.build("a","[X]");
+			link.href="#";
+			link.onclick=gui.details.categoryRemoveHandler;
+			elem.appendChild(link);
+			elem.setAttribute("data-dbid",cat.dbid);
+			return elem;
 		},
 		
 		categoryRemoveHandler:function(event){
 			//find torrent & category
-			//issue remove request
+			torrent=gui.elem("torrent-name-input").getAttribute("data-dbid");
+			category=event.target.parentNode.getAttribute("data-dbid");
+			//TODO issue remove request
+			window.alert("Removing mapping ("+torrent+","+category+")");
 			//upon success, kill button
-			//TODO
+			event.target.parentNode.parentNode.removeChild(event.target.parentNode);
+		},
+		
+		handleCategoryAdd:function(event){
+			var drop=gui.elem("add-cat-selector");
+			if(drop.selectedIndex!=0){
+				var cat=tracker.categoryDBIDtoIndex(drop.selectedIndex);
+				if(cat<0){
+					tracker.pushStatus("Invalid category selection.");
+					return;
+				}
+				
+				//TODO push to db
+				
+				var button=gui.details.createCategoryButton(tracker.categories[cat]);
+				event.target.parentNode.insertBefore(button,event.target);
+			}
+			else{
+				tracker.pushStatus("Invalid category selection.");
+			}
+			drop.selectedIndex=0;
 		}
 	}
 }
@@ -163,6 +194,16 @@ var tracker={
 		for(var i=0;i<tracker.torrents.length;i++){
 			//window.alert(" vs ");
 			if(tracker.torrents[i].dbid==dbid){
+				return i;
+			}
+		}
+		return -1;
+	},
+	
+	categoryDBIDtoIndex:function(dbid){
+		for(var i=0;i<tracker.categories.length;i++){
+			//window.alert(" vs ");
+			if(tracker.categories[i].dbid==dbid){
 				return i;
 			}
 		}
