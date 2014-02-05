@@ -183,7 +183,7 @@ var gui={
 					event.target.parentNode.insertBefore(button,event.target);
 				}
 				else{
-					tracker.pushStatus("Failed to delete category mapping!");
+					tracker.pushStatus("Failed to add category mapping!");
 				}
 			}
 			else{
