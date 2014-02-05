@@ -18,11 +18,12 @@
 			<div id="view-torrents">
 				<div>
 					<span class="fancybutton">Add</span>
-					<select id="cat-selector">
-						<option value="New">New</option>
-						<option value="New">Mov</option>
-						<option value="New">Games</option>
-					</select>
+					<a href="#" onclick="tracker.loadTorrents();"><span class="fancybutton">Refresh</span></a>
+					<span id="category-selector-wrap">
+						Category: 
+						<select id="cat-selector" onchange="tracker.loadTorrents();">
+						</select>
+					</span>
 				</div>
 				<div id="torrent-table-wrap">
 					<table id="torrent-table">
@@ -42,18 +43,18 @@
 			
 			<div id="view-details">
 				<div>
-					<span class="fancybutton">Back</span>
-					<h2>Torrent Title</h2>
+					<h2 id="torrent-name">n/a</h2><input type="text" id="torrent-name-input" /> <a href="#" onclick="gui.details.editTitle();" id="torrent-title-edit-link">[edit]</a>
+					<a href="#" onclick="tracker.showView('list');"><span class="fancybutton" id="details-back">Back</span></a>
 				</div>
 				
 				<div id="details-main">
-					
 					<div class="item" id="torrent-meta-info">
 						<h3>Metadata</h3>
 						<div class="subitem">
-							Info-Hash: asdasd<br/>
-							Completion Count: n<br/>
-							Peers/Seeds: x/y<br/>
+							Info-Hash: <span id="detail-torrent-hash">n/a</span><br/>
+							Size: <span id="detail-torrent-size">n/a</span><br/>
+							Completion Count: <span id="detail-torrent-count">n/a</span><br/>
+							Peers/Seeds: n/a<br/>
 						</div>
 					</div>
 					
@@ -63,20 +64,24 @@
 							<span class="cat-button">Porn</span>
 						</div>
 					</div>
-					
-					<div class="item">
-						<h3>Description</h3> [Edit]
-						<div class="subitem">
-							asdasdasd
-						</div>
-					</div>
+
 					<div class="item">
 						<h3>Options</h3>
 						<div class="subitem">
-							[Delete] [Download]
+							<a href="#" id="details-download-link">[Download]</a>
+							<a href="#">[Delete]</a>
 						</div>
 					</div>
 				</div>
+			</div>
+			
+			<div id="footer-text">
+				<span id="status-line">Status: <span id="status-text"></span></span>
+				<span id="meta-footer">
+					<a href="https://github.com/kitinfo/tracker-panel">[source]</a>
+					<a href="http://www.kopimi.com/kopimi/"><img src="static/kopimi.png"/></a>
+					<a href="http://wtfpl.net/"><img src="static/wtfpl.png"/></a>
+				</span>
 			</div>
 		</div>
 	</body>

@@ -9,15 +9,15 @@ var api={
 					completionfunc(data);
 				}
 				catch(e){
-					//todo display parse errors
+					tracker.pushStatus("Failed to parse server response");
 				}
 			}
 			else{
-				//todo display server error
+				tracker.pushStatus("Server replied with error code");
 			}
 		},
 		function(exc){
-			//todo display api errors
+			tracker.pushStatus("Failed to connect API ("+exc+")");
 		});
 	}
 }
@@ -60,7 +60,23 @@ var gui={
 			var row=gui.build("tr");
 			row.appendChild(gui.build("td",torrent.name,"name-column"));
 			row.appendChild(gui.build("td",torrent.count,"dlcount-column"));
-			row.appendChild(gui.build("td","[Download] [Details]","options-column"));
+			
+			var options=gui.build("td","","options-column");
+			var dllink=gui.build("a","[Download]");
+			var detlink=gui.build("a","[Details]");
+			
+			dllink.href=torrent.file;
+			detlink.href="#";
+			
+			detlink.onclick=function(event){
+				gui.updateDetailScreen(torrent);
+				tracker.showView("details");
+			}
+			
+			options.appendChild(dllink);
+			options.appendChild(detlink);
+			row.appendChild(options);
+			
 			gui.table.elem.appendChild(row);
 		},
 		
@@ -76,12 +92,59 @@ var gui={
 	
 	updateTrackedCount:function(){
 		gui.elem("torrent-count").textContent=tracker.torrents.length;
+	},
+	
+	updateCategoryDropdown:function(){
+		var drop=gui.elem("cat-selector");
+		drop.innerHTML="";
+		
+		var option=gui.build("option","New");
+		option.value=-1;
+		drop.appendChild(option);
+		
+		tracker.categories.forEach(function(cat){
+			option=gui.build("option",cat.name);
+			option.value=cat.dbid;
+			drop.appendChild(option);
+		});
+	},
+	
+	updateDetailScreen:function(torrent){
+		gui.elem("torrent-name").textContent=torrent.name;
+		gui.elem("torrent-name-input").value=torrent.name;
+		gui.elem("torrent-name").setAttribute("data-dbid",torrent.dbid);
+		gui.elem("detail-torrent-hash").textContent=torrent.hash;
+		gui.elem("detail-torrent-count").textContent=torrent.count;
+		gui.elem("detail-torrent-size").textContent=torrent.size;
+		gui.elem("details-download-link").href=torrent.file;
+		
+		gui.elem("torrent-name").style.display="inline-block";
+		gui.elem("torrent-title-edit-link").style.display="inline-block";
+		gui.elem("torrent-name-input").style.display="none";
+	},
+	
+	details:{
+		editTitle:function(){
+			gui.elem("torrent-name").style.display="none";
+			gui.elem("torrent-title-edit-link").style.display="none";
+			gui.elem("torrent-name-input").style.display="inline-block";
+		}
 	}
 }
 
 var tracker={
 	torrents:[],
+	categories:[],
 	views:{},
+	
+	torrentDBIDtoIndex:function(dbid){
+		for(var i=0;i<tracker.torrents.length;i++){
+			if(tracker.torrents.dbid==dbid){
+				return i;
+			}
+		}
+		return -1;
+	},
 	
 	init:function(){
 		tracker.views["list"]=document.getElementById("view-torrents");
@@ -89,7 +152,7 @@ var tracker={
 		
 		tracker.showView("list");
 		tracker.loadTorrents();
-		gui.table.init();
+		tracker.loadCategories();
 	},
 	
 	showView:function(tag){
@@ -100,25 +163,50 @@ var tracker={
 	},
 	
 	loadTorrents:function(){
+		//TODO respect filters
+		//TODO force single instance
 		api.request("torrents",function(data){
 			tracker.torrents=[];
 			data.torrents.forEach(function(elem){
-				tracker.torrents.push(new Torrent(elem.id, elem.hash, elem.name, elem.description, elem.downloaded, elem.file));
+				tracker.torrents.push(new Torrent(elem.id, elem.hash, elem.name, elem.downloaded, elem.file, elem.size));
 			});
 			gui.table.init();
 			gui.updateTrackedCount();
+			tracker.pushStatus("OK");
 		});
+	},
+	
+	loadCategories:function(){
+		api.request("categories",function(data){
+			tracker.categories=[];
+			data.categories.forEach(function(elem){
+				tracker.categories.push(new Category(elem.id, elem.name));
+			});
+			gui.updateCategoryDropdown();
+		});
+	},
+	
+	pushStatus:function(text){
+		gui.elem("status-text").textContent=text;
 	}
 }
 
-function Torrent(dbid, hash, name, desc, completioncount, file){
+function Torrent(dbid, hash, name, completioncount, file, size){
 	if(!hash||!name||!dbid){
 		return undefined;
 	}
 	this.dbid=dbid;
 	this.hash=hash;
 	this.name=name;
-	this.desc=desc;
 	this.count=completioncount;
 	this.file=file;
+	this.size=size;
+}
+
+function Category(dbid, name){
+	if(!dbid||!name){
+		return undefined;
+	}
+	this.dbid=dbid;
+	this.name=name;
 }

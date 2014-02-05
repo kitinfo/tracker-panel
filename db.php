@@ -26,7 +26,7 @@ if (isset($view)) {
 	$retVal[$tag] = getView($db, $view, $tag);
 }
 
-header("Content-Type: application/javascript");
+header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 # Rückmeldung senden
 
