@@ -313,7 +313,7 @@ var tracker={
 	},
 	
 	deleteDisplayedTorrent:function(){
-		api.syncpost("torrent-del",gui.elem("torrent-name-input").getAttribute("dbid"));
+		api.syncpost("torrent-del","id="+gui.elem("torrent-name-input").getAttribute("data-dbid"),"x-www-formencoded");
 		tracker.loadTorrents();
 		tracker.showView("list");
 	}
