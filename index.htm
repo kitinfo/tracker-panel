@@ -33,7 +33,9 @@
 			
 			<div id="view-details">
 				<div>
-					<h2 id="torrent-name">n/a</h2><input type="text" id="torrent-name-input" /> <a href="#" onclick="gui.details.editTitle();" id="torrent-title-edit-link">[edit]</a>
+					<h2 id="torrent-name">n/a</h2>
+					<input type="text" id="torrent-name-input" onkeydown="if(event.keyCode==13) tracker.modifyTorrentName();"/>
+					<a href="#" onclick="gui.details.editTitle();" id="torrent-title-edit-link">[edit]</a>
 					<a href="#" onclick="tracker.showView('list');"><span class="fancybutton" id="details-back">Back</span></a>
 				</div>
 				
@@ -51,7 +53,9 @@
 					<div class="item" id="category-view">
 						<h3>Categories</h3> 
 						<div id="category-list">
-							<span class="cat-button">Porn</span>
+							<span class="cat-button">Porn <a href="#" onclick="gui.details.categoryRemoveHandler(event);">[X]</a></span>
+							<select id="add-cat-selector" onchange="">
+							</select>
 						</div>
 					</div>
 
@@ -59,7 +63,7 @@
 						<h3>Options</h3>
 						<div class="subitem">
 							<a href="#" id="details-download-link">[Download]</a>
-							<a href="#">[Delete]</a>
+							<a href="#" onclick="tracker.deleteDisplayedTorrent();">[Delete]</a>
 						</div>
 					</div>
 				</div>

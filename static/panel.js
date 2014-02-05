@@ -94,29 +94,36 @@ var gui={
 		gui.elem("torrent-count").textContent=tracker.torrents.length;
 	},
 	
-	updateCategoryDropdown:function(){
+	updateCategoryDropdowns:function(){
 		var drop=gui.elem("cat-selector");
+		var adder=gui.elem("add-cat-selector");
 		drop.innerHTML="";
+		adder.innerHTML="";
 		
 		var option=gui.build("option","All");
-		option.value=-2;
+		option.value="all";
 		drop.appendChild(option);
 		
-		var option=gui.build("option","New");
-		option.value=-1;
+		option=gui.build("option","New");
+		option.value="new";
 		drop.appendChild(option);
+		
+		option=gui.build("option","--add--");
+		option.value=0;
+		adder.appendChild(option);
 		
 		tracker.categories.forEach(function(cat){
 			option=gui.build("option",cat.name);
 			option.value=cat.dbid;
 			drop.appendChild(option);
+			adder.appendChild(option);
 		});
 	},
 	
 	updateDetailScreen:function(torrent){
 		gui.elem("torrent-name").textContent=torrent.name;
 		gui.elem("torrent-name-input").value=torrent.name;
-		gui.elem("torrent-name").setAttribute("data-dbid",torrent.dbid);
+		gui.elem("torrent-name-input").setAttribute("data-dbid",torrent.dbid);
 		gui.elem("detail-torrent-hash").textContent=torrent.hash;
 		gui.elem("detail-torrent-count").textContent=torrent.count;
 		gui.elem("detail-torrent-size").textContent=torrent.size;
@@ -132,6 +139,17 @@ var gui={
 			gui.elem("torrent-name").style.display="none";
 			gui.elem("torrent-title-edit-link").style.display="none";
 			gui.elem("torrent-name-input").style.display="inline-block";
+		},
+		
+		createCategoryButton:function(cat){
+			//TODO
+		},
+		
+		categoryRemoveHandler:function(event){
+			//find torrent & category
+			//issue remove request
+			//upon success, kill button
+			//TODO
 		}
 	}
 }
@@ -143,7 +161,8 @@ var tracker={
 	
 	torrentDBIDtoIndex:function(dbid){
 		for(var i=0;i<tracker.torrents.length;i++){
-			if(tracker.torrents.dbid==dbid){
+			//window.alert(" vs ");
+			if(tracker.torrents[i].dbid==dbid){
 				return i;
 			}
 		}
@@ -169,7 +188,9 @@ var tracker={
 	loadTorrents:function(){
 		//TODO respect filters (default: all)
 		//TODO force single instance
-		api.request("torrents",function(data){
+		var drop=gui.elem("cat-selector");
+		var api_arg=(drop.value=="all"||!drop.value)?"":"&cat="+drop.value;
+		api.request("torrents"+api_arg,function(data){
 			tracker.torrents=[];
 			data.torrents.forEach(function(elem){
 				tracker.torrents.push(new Torrent(elem.id, elem.hash, elem.name, elem.downloaded, elem.file, elem.size));
@@ -186,12 +207,28 @@ var tracker={
 			data.categories.forEach(function(elem){
 				tracker.categories.push(new Category(elem.id, elem.name));
 			});
-			gui.updateCategoryDropdown();
+			gui.updateCategoryDropdowns();
 		});
 	},
 	
 	pushStatus:function(text){
 		gui.elem("status-text").textContent=text;
+	},
+	
+	modifyTorrentName:function(){
+		var input=gui.elem("torrent-name-input");
+		var torrent=input.getAttribute("data-dbid");
+		var index=tracker.torrentDBIDtoIndex(torrent);
+		window.alert("TODO: Change torrent "+torrent+" (index "+index+") name to "+input.value);
+		gui.updateDetailScreen(tracker.torrents[index]);
+	},
+	
+	modifyTorrentCategory:function(action, torrent, category){
+		//TODO
+	},
+	
+	deleteDisplayedTorrent:function(){
+		//TODO issue delete request
 	}
 }
 
