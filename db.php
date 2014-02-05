@@ -20,7 +20,7 @@ $http_raw = file_get_contents("php://input");
 $db = new PDO("sqlite:backing.db3");
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
         
-$retVal["status"]="ok";
+$retVal["status"] = "nothing to do";
 
 $tables = array_keys($TABLES);
 foreach ($tables as $table) {
@@ -45,6 +45,7 @@ $catfor = $_GET["catfor"];
 if (isset($catfor) && !empty($catfor)) {
 
     $retVal["categories"] = getView($db, $catfor, "torrentcategories", "id");
+    $retVal["status"] = array(0);
 }
 
 if (isset($torrents) && isset($cat) && !empty($cat)) {
