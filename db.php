@@ -73,6 +73,10 @@ if (isset($http_raw) && !empty($http_raw)) {
     if (isset($_GET["torrent-del"])) {
 	$retVal["status"] = delTorrent($db, $obj["id"]);
     }
+
+    if (isset($_GET["torrent-rename"])) {
+	$retVal["status"] = renameTorrent($db, $obj["id"], $obj["name"]);
+    }
 }
 
 
@@ -85,6 +89,23 @@ if (isset($_GET["callback"]) && !empty($_GET["callback"])) {
     echo $callback . "('" . json_encode($retVal, JSON_NUMERIC_CHECK) . "')";
 } else {
     echo json_encode($retVal, JSON_NUMERIC_CHECK);
+}
+
+
+function renameTorrent($db, $id, $name) {
+
+    $query = "UPDATE torrents SET name = :name WHERE id= :id";
+
+    $stm = $db->prepare($query);
+    $stm->execute(array(
+	":id" => $id,
+	":name" => $name
+    ));
+
+    $retVal = $stm->errorInfo();
+
+    $stm->closeCursor();
+    return $retVal;
 }
 
 function delTorrent($db, $torrent) {
