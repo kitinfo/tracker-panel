@@ -57,7 +57,7 @@ if (isset($torrents) && isset($cat) && !empty($cat)) {
 
 $delTorrent = $_POST["torrent-del"];
 
-if (issst($delTorrent) && !empty($delTorrent)) {
+if (isset($delTorrent) && !empty($delTorrent)) {
     $retVal["status"] = delTorrent($db, $torrent);
 }
 
