@@ -313,7 +313,9 @@ var tracker={
 	},
 	
 	deleteDisplayedTorrent:function(){
-		//TODO issue delete request
+		api.syncpost("torrent-del",gui.elem("torrent-name-input").getAttribute("dbid"));
+		tracker.loadTorrents();
+		tracker.showView("list");
 	}
 }
 
