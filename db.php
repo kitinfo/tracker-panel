@@ -10,6 +10,8 @@ $VIEWS = array(
     "newtorrents" => "id"
 );
 
+$http_raw = file_get_contents("php://input");
+
 
 //TODO: POST delete torrent
 //TODO: POST delete catmapping
@@ -45,6 +47,21 @@ if (isset($torrents) && isset($cat) && !empty($cat)) {
     }
 }
 
+
+if (isset($http_raw) && !empty($http_raw)) {
+
+    $obj = json_decode($http_raw, true);
+
+    if (isset($_GET["category-add"])) {
+
+	$retVal["status"] = addCatMapping($db, $obj["torrent"], $obj["category"]);
+    }
+    if (isset($_GET["category-del"])) {
+	$retVal["status"] = delCatMapping($db, $obj["torrent"], $obj["category"]);
+    }
+}
+
+
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 # Rückmeldung senden
@@ -54,6 +71,44 @@ if (isset($_GET["callback"]) && !empty($_GET["callback"])) {
     echo $callback . "('" . json_encode($retVal, JSON_NUMERIC_CHECK) . "')";
 } else {
     echo json_encode($retVal, JSON_NUMERIC_CHECK);
+}
+
+function addCatMapping($db, $torrent, $cat) {
+
+    $query = "INSERT INTO categorymap (torrent, category) VALUES(:torrent, :cat)";
+
+    $stm = $db->prepare($query);
+    if ($db->errorCode() != "0000") {
+	return $db->errorInfo();
+    }
+    $stm->execute(array(
+	":torrent" => $torrent,
+	":cat" => $cat
+    ));
+
+    $retVal = $stm->errorCode();
+
+    $stm->closeCursor();
+    return $retVal;
+}
+
+function delCatMapping($db, $torrent, $cat) {
+
+    $query = "DELETE FROM categorymap WHERE torrent = :torrent AND category = :cat";
+
+    $stm = $db->prepare($query);
+    if ($db->errorCode() != "0000") {
+	return $db->errorInfo();
+    }
+    $stm->execute(array(
+	":torrent" => $torrent,
+	":cat" => $cat
+    ));
+
+    $retVal = $stm->errorCode();
+
+    $stm->closeCursor();
+    return $retVal;
 }
 
 function getView($db, $data, $tag, $search) {
