@@ -145,7 +145,6 @@ var gui={
 		
 		while(buttons.length>0){
 			listnode.removeChild(buttons[0]);
-			window.alert("Removed!");
 		}
 		
 		//fetch active categories
