@@ -6,7 +6,7 @@ $TABLES = array(
     "torrents" => "id"
 );
 $VIEWS = array(
-    "torrentcategories" => "torrent",
+    "torrentcategories" => "id",
     "newtorrents" => "id"
 );
 
@@ -38,6 +38,14 @@ foreach ($viewKeys as $view) {
 
 $cat = $_GET["cat"];
 $torrents = $_GET["torrents"];
+
+
+$catfor = $_GET["catfor"];
+
+if (isset($catfor) && !empty($catfor)) {
+
+    $retVal["categories"] = getView($db, $catfor, "torrentcategories", "id");
+}
 
 if (isset($torrents) && isset($cat) && !empty($cat)) {
     if ($cat == "new") {
@@ -78,9 +86,6 @@ function addCatMapping($db, $torrent, $cat) {
     $query = "INSERT INTO categorymap (torrent, category) VALUES(:torrent, :cat)";
 
     $stm = $db->prepare($query);
-    if ($db->errorCode() != "0000") {
-	return $db->errorInfo();
-    }
     $stm->execute(array(
 	":torrent" => $torrent,
 	":cat" => $cat
@@ -97,9 +102,6 @@ function delCatMapping($db, $torrent, $cat) {
     $query = "DELETE FROM categorymap WHERE torrent = :torrent AND category = :cat";
 
     $stm = $db->prepare($query);
-    if ($db->errorCode() != "0000") {
-	return $db->errorInfo();
-    }
     $stm->execute(array(
 	":torrent" => $torrent,
 	":cat" => $cat
