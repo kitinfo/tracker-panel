@@ -9,7 +9,7 @@ var api={
 					completionfunc(data);
 				}
 				catch(e){
-					tracker.pushStatus("Failed to parse server response");
+					tracker.pushStatus("Failed to parse server response ("+e+")");
 				}
 			}
 			else{
@@ -139,7 +139,30 @@ var gui={
 		gui.elem("torrent-title-edit-link").style.display="inline-block";
 		gui.elem("torrent-name-input").style.display="none";
 		
+		//clear elements
+		var listnode=gui.elem("category-list");
+		var buttons=listnode.getElementsByClassName("cat-button");
 		
+		for(var i=0;i<buttons.length;i++){
+			listnode.removeChild(buttons[i]);
+		}
+		
+		//fetch active categories
+		api.request("catfor="+torrent.dbid,function(data){
+			if(data.categories){
+				data.categories.forEach(function(entry){
+					var catid=tracker.categoryDBIDtoIndex(entry.category);
+					if(catid>0){
+						var button=gui.details.createCategoryButton(tracker.categories[catid]);
+						var adder=gui.elem("add-cat-selector");
+						adder.parentNode.insertBefore(button,adder);
+					}
+					else{
+						tracker.pushState("Invalid category "+entry.category);
+					}
+				});
+			}
+		});
 	},
 	
 	details:{
@@ -276,8 +299,11 @@ var tracker={
 		var req=api.syncpost("category-"+action,JSON.stringify({"torrent":torrent,"category":category}));
 		try{
 			var reply=JSON.parse(req.responseText);
-			if(reply.status==0){
+			if(reply.status[0]==0){
 				return true;
+			}
+			else{
+				tracker.pushStatus("Action failed: "+reply.status[2]);
 			}
 			return false;
 		}
