@@ -43,7 +43,12 @@ def get_comment(torrent):
 
 def add_torrent(torrent_hash, torrent_comment, torrent_file, torrent_size):
 	#sqlite3 -line $SQL_DB "insert into torrents ("hash") values (\"$hash\");"
-	os.system("sqlite3 -line " + DATABASE + " \"INSERT INTO torrents (hash, name, file, size) VALUES ('%s','%s','torrents/%s','%s')\"" % (torrent_hash, torrent_comment, torrent_file, torrent_size))
+	ret = subprocess.check_output("sqlite3 -line " + DATABASE + " \"INSERT INTO torrents (hash, name, file, size) VALUES ('%s','%s','torrents/%s','%s')\"" % (torrent_hash, torrent_comment, torrent_file, torrent_size))
+	if re.match(".*locked.*", ret):
+		return "locked"
+	if re.match(".*duplicate.*", ret):	# untested, replace match string by actual regex
+		return "rejected"
+	return ""
 
 def is_correct(torrent):
 	tracker = str(subprocess.check_output([TORRENTINFO, "-v", "-k", "announce", torrent]), encoding="utf-8").strip()
@@ -57,18 +62,24 @@ os.chdir(INCOMING)
 files = os.listdir()
 os.system("chmod -x *.torrent") # lel faggots marking files as executable
 
-for torrent in files:
+for torrent in sorted(files):
 	if re.match(".*\.torrent", torrent):
 		torrents.append(torrent)
-for torrent in torrents:
+for torrent in sorted(torrents):
 	if is_correct(torrent):
 		log(torrent + " is correct")
 		torrent_hash = get_hash(torrent)
 		torrent_size = get_size(torrent)
 		torrent_comment = get_comment(torrent)
 		torrent_file = torrent_hash + ".torrent"
-		os.rename(torrent, ACTIVE + torrent_file)
-		add_torrent(torrent_hash, torrent_comment, torrent_file, torrent_size)
+		ret = add_torrent(torrent_hash, torrent_comment, torrent_file, torrent_size)
+		if (ret == "locked"):
+			log(torrent + " Database locked.")
+		else if (ret == "rejected"):
+			log(torrent + " Torrent rejected.")
+			os.rename(torrent, REJECTED + torrent_file)
+		else:
+			os.rename(torrent, ACTIVE + torrent_file)
 	else:
 		log(torrent + " is incorrect")
 		os.rename(torrent, REJECTED + torrent)
