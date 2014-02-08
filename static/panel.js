@@ -216,6 +216,23 @@ var gui={
 			}
 			drop.selectedIndex=0;
 		}
+	},
+
+	upload:{
+		handleFormUpload:function(event){
+			tracker.handleFilesForUpload(event.target.files);
+			event.target.value=null;
+		},
+
+		handleDrop:function(event){
+			if(event.dataTransfer&&event.dataTransfer.files){
+				tracker.handleFilesForUpload(event.dataTransfer.files);
+			}
+		},
+
+		hideFunctionality:function(){
+			gui.elem("upload-form").style.display="none";
+		}
 	}
 }
 
@@ -249,6 +266,11 @@ var tracker={
 		tracker.showView("list");
 		tracker.loadCategories();
 		tracker.loadTorrents();
+
+		if(!window.File||!window.FileList||!window.FileReader){
+			gui.upload.hideFunctionality();
+			tracker.pushStatus("Upload not supported, functionality disabled");
+		}
 	},
 	
 	showView:function(tag){
@@ -340,6 +362,13 @@ var tracker={
 		}
 		tracker.loadTorrents();
 		tracker.showView("list");
+	},
+
+	handleFilesForUpload:function(files){
+		for(var i=0;i<files.length;i++){
+			var f=files[i];
+			window.alert("Name: "+f.name+"\nType: "+f.type+"\nSize: "+f.size);
+		}
 	}
 }
 

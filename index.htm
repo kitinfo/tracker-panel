@@ -10,14 +10,17 @@
 	</head>
 	<body onload="tracker.init();">
 		<div id="center-wrap">
-			<div id="head-info">
+			<div id="head-info" ondrop="gui.upload.handleDrop(event);">
 				<img src="static/header.svg" alt="Tracker Panel Head Image" />
 				<div>Currently displaying <span id="torrent-count">n/a</span> torrents</div>
 			</div>
-			
+		
+			<div id="view-uploads">
+			</div>
+	
 			<div id="view-torrents">
 				<div>
-					<span class="fancybutton">Add</span>
+					<span class="fancybutton" id="upload-form"><input value="Upload" type="file" id="file-upload-btn" onchange="gui.upload.handleFormUpload(event);" multiple="multiple" /></span>
 					<a href="#" onclick="tracker.loadTorrents();"><span class="fancybutton">Refresh</span></a>
 					<span id="category-selector-wrap">
 						Category: 
