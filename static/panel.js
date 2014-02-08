@@ -225,9 +225,15 @@ var gui={
 		},
 
 		handleDrop:function(event){
+			gui.upload.stopPropagation(event);
 			if(event.dataTransfer&&event.dataTransfer.files){
 				tracker.handleFilesForUpload(event.dataTransfer.files);
 			}
+		},
+
+		stopPropagation:function(event){
+			event.stopPropagation();
+			event.preventDefault();
 		},
 
 		hideFunctionality:function(){

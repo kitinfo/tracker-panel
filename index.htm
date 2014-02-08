@@ -10,7 +10,7 @@
 	</head>
 	<body onload="tracker.init();">
 		<div id="center-wrap">
-			<div id="head-info" ondrop="gui.upload.handleDrop(event);">
+			<div id="head-info" ondrop="gui.upload.handleDrop(event);" ondragenter="gui.upload.stopPropagation(event);" ondragover="gui.upload.stopPropagation(event);">
 				<img src="static/header.svg" alt="Tracker Panel Head Image" />
 				<div>Currently displaying <span id="torrent-count">n/a</span> torrents</div>
 			</div>
