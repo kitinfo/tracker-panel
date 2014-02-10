@@ -29,7 +29,7 @@
 	
 			<div id="view-torrents">
 				<div>
-					<span class="fancybutton" id="upload-form"><input value="Upload" type="file" id="file-upload-btn" onchange="gui.upload.handleFormUpload(event);" multiple="multiple" /></span>
+					<span class="fancybutton" id="upload-form" onclick="gui.elem('file-upload-btn').click()">Add <input value="Upload" type="file" id="file-upload-btn" onchange="gui.upload.handleFormUpload(event);" multiple="multiple" /></span>
 					<a href="#" onclick="tracker.loadTorrents();"><span class="fancybutton">Refresh</span></a>
 					<span id="category-selector-wrap">
 						Category: 
