@@ -36,7 +36,7 @@ h2,h3{
 	height:10em;
 }
 
-#view-torrents, #view-details{
+#view-torrents, #view-details, #view-uploads{
 	border-radius:1em;
 	background-color:#ccc;
 	width:100%;
@@ -46,8 +46,30 @@ h2,h3{
 	margin-top:0.5em;
 }
 
+#view-uploads{
+	min-height:1em;
+}
+
+.icebreaker{
+	clear:both;
+}
+
 #category-selector-wrap{
 	float:right;
+}
+
+.upload-file{
+	margin:1em;
+	float:right;
+}
+
+.upload-queue{
+	padding-top:1em;
+}
+
+.upload-file-progress{
+	padding:0.2em 1em 0.2em 1em;
+	background-color:#eee;
 }
 
 .fancybutton {
