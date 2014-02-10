@@ -393,6 +393,7 @@ var tracker={
 	},
 	
 	uploadSingleFile:function(file, elem){
+		//TODO size limit
 		var req=new ajax.ajaxRequest();
 		var data=new FormData();
 		data.append("file", file);
@@ -415,7 +416,7 @@ var tracker={
 			
 			if(uploadlist.childElementCount==0){
 				uploadview.style.display="none";
-				//TODO fire update
+				tracker.loadTorrents();
 			}
 		};
 		
