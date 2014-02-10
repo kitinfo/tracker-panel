@@ -52,6 +52,8 @@ h2,h3{
 
 #view-uploads{
 	min-height:1em;
+	text-align:center;
+	display:none;
 }
 
 .icebreaker{
@@ -62,18 +64,18 @@ h2,h3{
 	float:right;
 }
 
-.upload-file{
-	margin:1em;
-	float:right;
-}
-
 .upload-queue{
 	padding-top:1em;
+}
+
+.upload-file{
+	margin:1em;
 }
 
 .upload-file-progress{
 	padding:0.2em 1em 0.2em 1em;
 	background-color:#eee;
+	border-radius:0.3em;
 }
 
 .fancybutton {

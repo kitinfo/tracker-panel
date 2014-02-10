@@ -238,6 +238,19 @@ var gui={
 
 		hideFunctionality:function(){
 			gui.elem("upload-form").style.display="none";
+		},
+		
+		createDisplay:function(file){
+			var wrap=gui.build("div","Upload: ","upload-file");
+			var progressbar=gui.build("span",file.name+" ","upload-file-progress");
+			var progressindicator=gui.build("span","(0%)","upload-file-percentage");
+			var cancelbtn=gui.build("span","Cancel","fancybutton");
+			
+			wrap.appendChild(progressbar);
+			progressbar.appendChild(progressindicator);
+			wrap.appendChild(cancelbtn);
+			
+			return wrap;
 		}
 	}
 }
@@ -371,10 +384,44 @@ var tracker={
 	},
 
 	handleFilesForUpload:function(files){
+		gui.elem("view-uploads").style.display="block";
 		for(var i=0;i<files.length;i++){
-			var f=files[i];
-			window.alert("Name: "+f.name+"\nType: "+f.type+"\nSize: "+f.size);
+			var elem=gui.upload.createDisplay(files[i]);
+			gui.elem("upload-file-wrapper").appendChild(elem);
+			tracker.uploadSingleFile(files[i], elem);
 		}
+	},
+	
+	uploadSingleFile:function(file, elem){
+		var req=new ajax.ajaxRequest();
+		var data=new FormData();
+		data.append("file", file);
+		
+		var percentage=elem.getElementsByClassName("upload-file-percentage")[0];
+		var progress=elem.getElementsByClassName("upload-file-progress")[0];
+		
+		req.upload.onprogress=function(event){
+			if(event.lengthComputable){
+				var complete=(event.loaded/event.total*100 | 0);
+				percentage.textContent="("+complete+"%)";
+				progress.style.backgroundImage="linear-gradient(to left, #666 0%, #eee "+(100-complete)+"%)";
+			}
+		};
+		
+		req.onload=function(event){
+			var uploadview=gui.elem("view-uploads");
+			var uploadlist=gui.elem("upload-file-wrapper");
+			uploadlist.removeChild(elem);
+			
+			if(uploadlist.childElementCount==0){
+				uploadview.style.display="none";
+				//TODO fire update
+			}
+		};
+		
+		req.open("POST","upload.php");
+		
+		req.send(data);
 	}
 }
 

@@ -16,13 +16,8 @@
 			</div>
 		
 			<div id="view-uploads">
-				<span class="upload-queue">
-					Upload Queue: 5 Elements [Show]
-				</span>
-				<span class="upload-file">
-					Uploading file: 
-					<span class="upload-file-progress">asdasd.asd (80%)</span>
-					<span class="fancybutton">Cancel</span>
+				<span id="upload-file-wrapper">
+					<!-- TODO hide when not in use -->
 				</span>
 				<div class="icebreaker"></div>
 			</div>
@@ -30,7 +25,7 @@
 			<div id="view-torrents">
 				<div>
 					<span class="fancybutton" id="upload-form" onclick="gui.elem('file-upload-btn').click()">Add <input value="Upload" type="file" id="file-upload-btn" onchange="gui.upload.handleFormUpload(event);" multiple="multiple" /></span>
-					<a href="#" onclick="tracker.loadTorrents();"><span class="fancybutton">Refresh</span></a>
+					<span onclick="tracker.loadTorrents();" class="fancybutton">Refresh</span>
 					<span id="category-selector-wrap">
 						Category: 
 						<select id="cat-selector" onchange="tracker.loadTorrents();">
@@ -48,7 +43,7 @@
 					<h2 id="torrent-name">n/a</h2>
 					<input type="text" id="torrent-name-input" onkeydown="if(event.keyCode==13) tracker.modifyTorrentName();"/>
 					<a href="#" onclick="gui.details.editTitle();" id="torrent-title-edit-link">[edit]</a>
-					<a href="#" onclick="tracker.showView('list');"><span class="fancybutton" id="details-back">Back</span></a>
+					<span onclick="tracker.showView('list');" class="fancybutton" id="details-back">Back</span>
 				</div>
 				
 				<div id="details-main">
