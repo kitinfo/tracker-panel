@@ -238,6 +238,8 @@ var gui={
 
 		hideFunctionality:function(){
 			gui.elem("upload-form").style.display="none";
+			gui.elem("head-info").ondrop=function(event){return;};
+			gui.elem("file-upload-btn").onchange=function(event){return;};
 		},
 		
 		createDisplay:function(file){
@@ -259,6 +261,9 @@ var tracker={
 	torrents:[],
 	categories:[],
 	views:{},
+	settings:{
+		uploadEnabled:true
+	},
 	
 	torrentDBIDtoIndex:function(dbid){
 		for(var i=0;i<tracker.torrents.length;i++){
@@ -286,9 +291,11 @@ var tracker={
 		tracker.loadCategories();
 		tracker.loadTorrents();
 
-		if(!window.File||!window.FileList||!window.FileReader){
+		if(!window.File||!window.FileList||!window.FileReader||!tracker.settings.uploadEnabled){
 			gui.upload.hideFunctionality();
-			tracker.pushStatus("Upload not supported, functionality disabled");
+			if(tracker.settings.uploadEnabled){
+				tracker.pushStatus("Upload not supported, functionality disabled");
+			}
 		}
 	},
 	
