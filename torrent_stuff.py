@@ -75,7 +75,7 @@ for torrent in sorted(torrents):
 		ret = add_torrent(torrent_hash, torrent_comment, torrent_file, torrent_size)
 		if (ret == "locked"):
 			log(torrent + " Database locked.")
-		else if (ret == "rejected"):
+		elif (ret == "rejected"):
 			log(torrent + " Torrent rejected.")
 			os.rename(torrent, REJECTED + torrent_file)
 		else:
