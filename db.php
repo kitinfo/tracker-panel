@@ -13,9 +13,6 @@ $VIEWS = array(
 $http_raw = file_get_contents("php://input");
 
 
-//TODO: POST delete torrent
-//TODO: POST delete catmapping
-//TODO: POST add catmapping
 # open db
 $db = new PDO("sqlite:backing.db3");
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
