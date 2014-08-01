@@ -76,20 +76,22 @@ for id, name in cursor.fetchall():
 	category_ids[name.lower()] = id
 
 # now sort torrents according to the incoming subfolder
-files = {'untagged': []}
-files['untagged'] = glob.glob('*.torrent')
+files = {None: []}
+files[None] = glob.glob('*.torrent')
 tagged_files = glob.glob('*/*.torrent')
 for f in tagged_files:
 	category, filename = f.split('/')
-	category = category.lower()
 	if category in category_ids:
-		files.setdefault(category_ids[category], [])
-		files[category_ids[category]].append(filename)
+		files.setdefault(category, [])
+		files[category].append(filename)
 
 os.system("chmod -x *.torrent") # lel faggots marking files as executable
 
-for category_id in files:
-	for torrent in files[category_id]:
+for category in files:
+	for torrent in files[category]:
+        if category != None:
+        	torrent = '/'.join([category, torrent])
+
 		if is_correct(torrent):
 			log(torrent + " is correct")
 			torrent_hash = get_hash(torrent)
@@ -99,8 +101,8 @@ for category_id in files:
 			
 			try:
 				ret = add_torrent(cursor, torrent_hash, torrent_comment, torrent_file, torrent_size)
-				if isinstance(category_id, int):
-					add_categorymap(cursor, ret, category_id)
+				if category != None:
+					add_categorymap(cursor, ret, category_ids[category])
 				os.rename(torrent, ACTIVE + torrent_file)
 			except sqlite3.IntegrityError:
 				log(torrent + " Torrent rejected.")
