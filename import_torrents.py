@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os
+import os, glob
 import re
 import subprocess
 import sqlite3
@@ -49,8 +49,12 @@ def add_torrent(db, torrent_hash, torrent_comment, torrent_file, torrent_size):
 #	if re.match(".*duplicate.*", ret):	# untested, replace match string by actual regex
 #		return "rejected"
 #	return ""
-	db.execute('INSERT INTO torrents (hash, name, file, size) VALUES (?,?,?,?)', torrent_hash, torrent_comment, "torrents/"+torrent_file, torrent_size)
+	db.execute('INSERT INTO torrents (hash, name, file, size) VALUES (?,?,?,?)', (torrent_hash, torrent_comment, "torrents/"+torrent_file, torrent_size))
 	return db.lastrowid
+
+def add_categorymap(db, torrent_id, category_id):
+	return db.execute('INSERT INTO categorymap (torrent, category) VALUES (?, ?)',
+			(torrent_id, category_id))
 
 def is_correct(torrent):
 	tracker = str(subprocess.check_output([TORRENTINFO, "-v", "-k", "announce", torrent]), encoding="utf-8").strip()
@@ -63,32 +67,47 @@ def is_correct(torrent):
 dbconn=sqlite3.connect(DATABASE)
 os.chdir(INCOMING)
 
-#TODO: get list of genres, cd into folders
+cursor = dbconn.cursor()
 
-files = os.listdir()
+# ok, get all possible category ids
+category_ids = {}
+cursor.execute('SELECT id, name FROM categories')
+for id, name in cursor.fetchall():
+	category_ids[name.lower()] = id
+
+# now sort torrents according to the incoming subfolder
+files = {'untagged': []}
+files['untagged'] = glob.glob('*.torrent')
+tagged_files = glob.glob('*/*.torrent')
+for f in tagged_files:
+	category, filename = f.split('/')
+	category = category.lower()
+	if category in category_ids:
+		files.setdefault(category_ids[category], [])
+		files[category_ids[category]].append(filename)
+
 os.system("chmod -x *.torrent") # lel faggots marking files as executable
 
-for torrent in sorted(files):
-	if re.match(".*\.torrent", torrent):
-		torrents.append(torrent)
-for torrent in sorted(torrents):
-	if is_correct(torrent):
-		log(torrent + " is correct")
-		torrent_hash = get_hash(torrent)
-		torrent_size = get_size(torrent)
-		torrent_comment = get_comment(torrent)
-		torrent_file = torrent_hash + ".torrent"
-		ret = add_torrent(dbconn, torrent_hash, torrent_comment, torrent_file, torrent_size)
-	#	if (ret == "locked"):
-	#		log(torrent + " Database locked.")
-	#	elif (ret == "rejected"):
-	#		log(torrent + " Torrent rejected.")
-	#		os.rename(torrent, REJECTED + torrent_file)
-	#	else:
-	#		os.rename(torrent, ACTIVE + torrent_file)
-	else:
-		log(torrent + " is incorrect")
-		os.rename(torrent, REJECTED + torrent)
+for category_id in files:
+	for torrent in files[category_id]:
+		if is_correct(torrent):
+			log(torrent + " is correct")
+			torrent_hash = get_hash(torrent)
+			torrent_size = get_size(torrent)
+			torrent_comment = get_comment(torrent)
+			torrent_file = torrent_hash + ".torrent"
+			
+			try:
+				ret = add_torrent(cursor, torrent_hash, torrent_comment, torrent_file, torrent_size)
+				if isinstance(category_id, int):
+					add_categorymap(cursor, ret, category_id)
+				os.rename(torrent, ACTIVE + torrent_file)
+			except sqlite3.IntegrityError:
+				log(torrent + " Torrent rejected.")
+				os.rename(torrent, REJECTED + torrent_file)
+		else:
+			log(torrent + " is incorrect")
+			os.rename(torrent, REJECTED + torrent)
 
 dbconn.commit()
 dbconn.close()
