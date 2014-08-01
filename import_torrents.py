@@ -4,11 +4,12 @@ import os, glob
 import re
 import subprocess
 import sqlite3
+import sys
 
 #os.system("rm -rf /")
 LOG = 1
-REJECTED = "../torrents-rejected/"
-ACTIVE = "../torrents-active/"
+REJECTED = "/home/krempel/torrents-rejected/"
+ACTIVE = "/home/krempel/torrents-active/"
 INCOMING = "torrents-incoming/"
 ACTUAL_TRACKER = "http://10.42.23.1:6969/announce"
 TORRENTINFO = "../torrentinfo"
@@ -17,7 +18,8 @@ DATABASE = "/var/www/tracker-panel/backing.db3"
 torrents = []
 def log(msg):
 	if LOG > 0:
-		print("INFO: " + msg)
+	#	print("INFO: " + msg.decode('utf-8', 'ignore'))
+		sys.stdout.buffer.write(bytes("INFO: " + msg, encoding="utf-8"))
 
 
 def get_hash(torrent):
@@ -37,6 +39,7 @@ def get_comment(torrent):
 	torrent_comment = str(subprocess.check_output([TORRENTINFO, "-v", "-k", "comment", torrent]), encoding="utf-8").strip()
 	if torrent_comment == "" or re.match(".*has no key \"comment\".*", torrent_comment):
 		log("Comment was empty")
+		torrent = torrent.split('/')[-1]
 		torrent_comment = re.sub("\.torrent", "", torrent)
 	log("Comment: " + torrent_comment)
 	return torrent_comment
@@ -81,16 +84,18 @@ files[None] = glob.glob('*.torrent')
 tagged_files = glob.glob('*/*.torrent')
 for f in tagged_files:
 	category, filename = f.split('/')
-	if category in category_ids:
+	if category.lower() in category_ids:
 		files.setdefault(category, [])
 		files[category].append(filename)
 
-os.system("chmod -x *.torrent") # lel faggots marking files as executable
+print(files)
+print(tagged_files)
+#os.system("chmod -x *.torrent") # lel faggots marking files as executable
 
 for category in files:
 	for torrent in files[category]:
-        if category != None:
-        	torrent = '/'.join([category, torrent])
+		if category != None:
+        		torrent = '/'.join([category, torrent])
 
 		if is_correct(torrent):
 			log(torrent + " is correct")
@@ -102,10 +107,11 @@ for category in files:
 			try:
 				ret = add_torrent(cursor, torrent_hash, torrent_comment, torrent_file, torrent_size)
 				if category != None:
-					add_categorymap(cursor, ret, category_ids[category])
+					add_categorymap(cursor, ret, category_ids[category.lower()])
 				os.rename(torrent, ACTIVE + torrent_file)
+				#log(torrent+" "+category)
 			except sqlite3.IntegrityError:
-				log(torrent + " Torrent rejected.")
+				#log(torrent + " Torrent rejected.")
 				os.rename(torrent, REJECTED + torrent_file)
 		else:
 			log(torrent + " is incorrect")
