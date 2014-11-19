@@ -1,8 +1,8 @@
 var api={
-	url:"db.php?",
+	url:"endpoint.php?",
 	
-	request:function(argument, completionfunc){
-		ajax.asyncGet(api.url+argument,function(request){
+	request:function(argument, payload, completionfunc){
+		ajax.asyncPost(api.url+argument, JSON.stringify(payload), function(request){
 			if(request.status==200){
 				try{
 					var data=JSON.parse(request.responseText);
@@ -18,11 +18,11 @@ var api={
 		},
 		function(exc){
 			tracker.pushStatus("Failed to connect API ("+exc+")");
-		});
+		}, "application/json");
 	},
 	
 	syncpost:function(argument, payload){
-		return ajax.syncPost(api.url+argument,payload,"application/json");
+		return ajax.syncPost(api.url+argument, JSON.stringify(payload), "application/json");
 	}
 }
 
@@ -156,7 +156,7 @@ var gui={
 		}
 		
 		//fetch active categories
-		api.request("catfor="+torrent.dbid,function(data){
+		api.request("categories",{"torrent":torrent.dbid},function(data){
 			if(data.categories){
 				data.categories.forEach(function(entry){
 					var catid=tracker.categoryDBIDtoIndex(entry.category);
@@ -322,8 +322,8 @@ var tracker={
 	loadTorrents:function(){
 		//TODO force single instance
 		var drop=gui.elem("cat-selector");
-		var api_arg=(drop.value=="all"||!drop.value)?"":"&cat="+drop.value;
-		api.request("torrents"+api_arg,function(data){
+		var api_arg=(drop.value=="all"||!drop.value)?"":""+drop.value;
+		api.request("torrents",{"category":api_arg},function(data){
 			tracker.torrents=[];
 			data.torrents.forEach(function(elem){
 				tracker.torrents.push(new Torrent(elem.id, elem.hash, elem.name, elem.downloaded, elem.file, elem.size));
@@ -335,7 +335,7 @@ var tracker={
 	},
 	
 	loadCategories:function(){
-		api.request("categories",function(data){
+		api.request("categories",{},function(data){
 			tracker.categories=[];
 			data.categories.forEach(function(elem){
 				tracker.categories.push(new Category(elem.id, elem.name));
@@ -353,7 +353,7 @@ var tracker={
 		var torrent=input.getAttribute("data-dbid");
 		var index=tracker.torrentDBIDtoIndex(torrent);
 		
-		var req=api.syncpost("torrent-rename",JSON.stringify({"id":torrent,"name":input.value}));
+		var req=api.syncpost("torrent-rename",{"torrent":torrent,"name":input.value});
 		try{
 			var reply=JSON.parse(req.responseText);
 			if(reply.status[0]!=0){
@@ -372,7 +372,7 @@ var tracker={
 	},
 	
 	modifyTorrentCategory:function(action, torrent, category){
-		var req=api.syncpost("category-"+action,JSON.stringify({"torrent":torrent,"category":category}));
+		var req=api.syncpost("category-"+action,{"torrent":torrent,"category":category});
 		try{
 			var reply=JSON.parse(req.responseText);
 			if(reply.status[0]==0){
@@ -389,7 +389,7 @@ var tracker={
 	},
 	
 	deleteDisplayedTorrent:function(){
-		var req=api.syncpost("torrent-del",JSON.stringify({"id":gui.elem("torrent-name-input").getAttribute("data-dbid")}),"x-www-formencoded");
+		var req=api.syncpost("torrent-del",{"torrent":gui.elem("torrent-name-input").getAttribute("data-dbid")},"x-www-formencoded");
 		try{
 			var data=JSON.parse(req.responseText);
 			if(data.status[0]!=0){
