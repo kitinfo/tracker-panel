@@ -1,0 +1,9 @@
+#!/bin/bash
+###########
+
+ADDRESS=http://tracker/add-hash
+
+while read line; do
+	HASH=$(./torrentinfo -H $i)
+	curl --data "hash=$HASH" $ADDRESS
+done
