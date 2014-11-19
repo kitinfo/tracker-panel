@@ -118,7 +118,7 @@ h2,h3{
 	display:none;
 }
 
-.options-column, .dlcount-column{
+.peers-column, .options-column, .dlcount-column{
 	white-space:nowrap;
 	text-align:center;
 }

@@ -56,6 +56,7 @@ var gui={
 			var headRow=gui.build("tr");
 			headRow.appendChild(gui.build("th","Name","name-column"));
 			headRow.appendChild(gui.build("th","Downloads","dlcount-column"));
+			headRow.appendChild(gui.build("th","Peers/Seeds","peers-column"));
 			headRow.appendChild(gui.build("th","Options","options-column"));
 			gui.table.elem.appendChild(headRow);
 		},
@@ -64,6 +65,7 @@ var gui={
 			var row=gui.build("tr");
 			row.appendChild(gui.build("td",torrent.name,"name-column"));
 			row.appendChild(gui.build("td",torrent.count,"dlcount-column"));
+			row.appendChild(gui.build("td",torrent.peers+"/"+torrent.seeds,"peers-column"));
 			
 			var options=gui.build("td","","options-column");
 			var magnetlink=gui.build("a","[Magnet]");
@@ -326,7 +328,7 @@ var tracker={
 		api.request("torrents",{"category":api_arg},function(data){
 			tracker.torrents=[];
 			data.torrents.forEach(function(elem){
-				tracker.torrents.push(new Torrent(elem.id, elem.hash, elem.name, elem.downloaded, elem.file, elem.size));
+				tracker.torrents.push(new Torrent(elem.id, elem.hash, elem.name, elem.downloaded, elem.file, elem.size, elem.seeds, elem.peers));
 			});
 			gui.table.init();
 			gui.updateTrackedCount();
@@ -446,7 +448,7 @@ var tracker={
 	}
 }
 
-function Torrent(dbid, hash, name, completioncount, file, size){
+function Torrent(dbid, hash, name, completioncount, file, size, seeds, peers){
 	if(!hash||!name||!dbid){
 		return undefined;
 	}
@@ -456,6 +458,8 @@ function Torrent(dbid, hash, name, completioncount, file, size){
 	this.count=completioncount;
 	this.file=file;
 	this.size=size;
+	this.seeds=seeds;
+	this.peers=peers;
 }
 
 function Category(dbid, name){
