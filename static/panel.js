@@ -66,10 +66,10 @@ var gui={
 			row.appendChild(gui.build("td",torrent.count,"dlcount-column"));
 			
 			var options=gui.build("td","","options-column");
-			var dllink=gui.build("a","[Download]");
+			var magnetlink=gui.build("a","[Magnet]");
 			var detlink=gui.build("a","[Details]");
 			
-			dllink.href=torrent.file;
+			magnetlink.href=tracker.magnetlink(torrent);
 			detlink.href="#";
 			
 			detlink.onclick=function(event){
@@ -77,7 +77,7 @@ var gui={
 				tracker.showView("details");
 			}
 			
-			options.appendChild(dllink);
+			options.appendChild(magnetlink);
 			options.appendChild(detlink);
 			row.appendChild(options);
 			
@@ -133,7 +133,15 @@ var gui={
 		gui.elem("detail-torrent-hash").textContent=torrent.hash;
 		gui.elem("detail-torrent-count").textContent=torrent.count;
 		gui.elem("detail-torrent-size").textContent=torrent.size;
-		gui.elem("details-download-link").href=torrent.file;
+		gui.elem("details-torrent-link").href=torrent.file;
+		if(torrent.file){
+			gui.elem("details-torrent-link").style.display="inline-block";
+		}
+		else{
+			gui.elem("details-torrent-link").style.display="none";
+		}
+
+		gui.elem("details-magnet-link").href=tracker.magnetlink(torrent);
 		
 		gui.elem("torrent-name").style.display="inline-block";
 		gui.elem("torrent-title-edit-link").style.display="inline-block";
@@ -263,6 +271,11 @@ var tracker={
 	views:{},
 	settings:{
 		uploadEnabled:true
+	},
+
+	magnetlink:function(torrent){
+		//FIXME use configurable tracker here
+		return "magnet:?xt=urn:btih:"+torrent.hash+"&dn="+encodeURI(torrent.name)+"&tr="+encodeURI("http://10.42.23.1:6969/announce");
 	},
 	
 	torrentDBIDtoIndex:function(dbid){
