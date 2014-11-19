@@ -1,6 +1,6 @@
 <?php
 
-$db=new PDO("sqlite:/home/cbdev/dev/tracker-panel/backing.db3");
+$db=new PDO("sqlite:backing.db3");
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
 $db->query("PRAGMA foreign_keys = ON");
 
@@ -108,6 +108,8 @@ function handleEndpoint($endpoint){
 
 $retVal["status"]=$db->errorInfo();
 
+header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
 print(json_encode($retVal));
 
 ?>
