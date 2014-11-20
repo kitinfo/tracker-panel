@@ -36,7 +36,6 @@ function handleEndpoint($endpoint){
 			if (!isset($http_dec["hash"]) && empty($http_dec["hash"])) {
 				break;
 			}
-			$retVal["toll"] = "sehr toll";
 			if (!isset($http_dec["name"]) && empty($http_dec["name"])) {
 				break;
 			}
