@@ -15,7 +15,8 @@ $endpoints=array(
 	"category-add",
 	"category-del",
 	"torrent-del",
-	"torrent-rename"
+	"torrent-rename",
+	"torrent-add"
 );
 
 foreach($endpoints as $endpoint){
@@ -31,6 +32,34 @@ function handleEndpoint($endpoint){
 	global $db;
 
 	switch($endpoint){
+		case "torrent-add":
+			if (!isset($http_dec["hash"]) && empty($http_dec["hash"])) {
+				break;
+			}
+			$retVal["toll"] = "sehr toll";
+			if (!isset($http_dec["name"]) && empty($http_dec["name"])) {
+				break;
+			}
+			if (!isset($http_dec["size"]) && empty($http_dec["size"])) {
+				break;
+			}
+
+			$stmt=$db->prepare("INSERT INTO torrents(hash, name, size) VALUES(:hash, :name, :size)");
+
+			$done = $stmt->execute(array(
+				":hash" => $http_dec["hash"],
+				":name" => $http_dec["name"],
+				":size" => $http_dec["size"]
+			));
+
+			if ($done) {
+
+				$retVal["torrent-add"] = $db->lastInsertId();
+			} else {
+				$retVal["torrent-add"] = -1;
+			}
+			
+			break;
 		case "torrents":
 			if(isset($http_dec["category"])&&!empty($http_dec["category"])){
 				if($http_dec["category"]=="new"){
