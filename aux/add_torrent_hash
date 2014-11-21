@@ -1,9 +1,14 @@
 #!/bin/bash
 ###########
 
-ADDRESS=http://tracker/add-hash
+ADDRESS=http://localhost/tracker-panel/endpoint.php?torrent-add
 
 while read line; do
-	HASH=$(./torrentinfo -H $i)
-	curl --data "hash=$HASH" $ADDRESS
+	FILE="$line"
+	NAME=$(basename "$FILE" | sed 's/.torrent//g')
+	HASH=$(./torrentinfo -H $FILE)
+	SIZE=$(./torrentinfo -v -k info.length $FILE)
+
+	echo "adding hash with name: $NAME, size: $SIZE and hash: $HASH\n"
+	curl --data "{ \"hash\":\"$HASH\", \"name\": \"$NAME\", \"size\":\"$SIZE\"}" $ADDRESS
 done
