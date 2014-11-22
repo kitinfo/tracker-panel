@@ -19,7 +19,7 @@ torrents = []
 def log(msg):
 	if LOG > 0:
 	#	print("INFO: " + msg.decode('utf-8', 'ignore'))
-		sys.stdout.buffer.write(bytes("INFO: " + msg, encoding="utf-8"))
+		sys.stdout.buffer.write(bytes("INFO: " + msg + "\r\n", encoding="utf-8"))
 
 
 def get_hash(torrent):
@@ -110,8 +110,8 @@ for category in files:
 					add_categorymap(cursor, ret, category_ids[category.lower()])
 				os.rename(torrent, ACTIVE + torrent_file)
 				#log(torrent+" "+category)
-			except sqlite3.IntegrityError:
-				#log(torrent + " Torrent rejected.")
+			except sqlite3.IntegrityError as e:
+				log(torrent + " was rejected by database (" + e.args[0] + ").")
 				os.rename(torrent, REJECTED + torrent_file)
 		else:
 			log(torrent + " is incorrect")
