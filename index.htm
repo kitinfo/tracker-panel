@@ -30,6 +30,10 @@
 						<select id="cat-selector" onchange="tracker.loadTorrents();">
 						</select>
 					</span>
+					<span class="align-right">
+						Seeded torrents only:
+						<input type="checkbox" id="hideNoSeeds" onchange="tracker.loadTorrents()" />
+					</span>
 				</div>
 				<div id="torrent-table-wrap">
 					<table id="torrent-table">

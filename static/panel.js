@@ -327,8 +327,11 @@ var tracker={
 		var api_arg=(drop.value=="all"||!drop.value)?"":""+drop.value;
 		api.request("torrents",{"category":api_arg},function(data){
 			tracker.torrents=[];
+			var hideNoSeeds = gui.elem("hideNoSeeds").checked;
 			data.torrents.forEach(function(elem){
-				tracker.torrents.push(new Torrent(elem.id, elem.hash, elem.name, elem.downloaded, elem.file, elem.size, elem.seeds, elem.peers));
+				if (!(hideNoSeeds && elem.seeds == 0)) {
+					tracker.torrents.push(new Torrent(elem.id, elem.hash, elem.name, elem.downloaded, elem.file, elem.size, elem.seeds, elem.peers));
+				}
 			});
 			gui.table.init();
 			gui.updateTrackedCount();
